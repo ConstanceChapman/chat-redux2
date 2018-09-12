@@ -1,31 +1,51 @@
 import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { createMessage } from '../actions/index';
 
 class MessageForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {value: ''};
+    this.state = { value: '' };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange(event) {
-    this.setState({value: event.target.value});
+    this.setState({ value: event.target.value });
   }
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.value);
     event.preventDefault();
+    this.props.createMessage(this.props.selectedChannel, this.props.currentUser, this.state.value);
+    this.setState({ value: '' }); // Reset message input
   }
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <input type="text" value={this.state.value} onChange={this.handleChange} placeholder="Type your message"/>
-        <input type="submit" value="Submit" />
+      <form onSubmit={this.handleSubmit} className="channel-editor">
+        <input
+          type="text"
+          autoComplete="off"
+          value={this.state.value}
+          onChange={this.handleChange}
+        />
+        <button type="submit">Send</button>
       </form>
     );
   }
 }
 
-export default MessageForm;
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({ createMessage }, dispatch);
+}
+
+function mapStateToProps(state) {
+  return {
+    currentUser: state.currentUser,
+    selectedChannel: state.selectedChannel
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MessageForm);

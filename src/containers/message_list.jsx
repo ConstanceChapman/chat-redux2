@@ -9,7 +9,26 @@ import MessageForm from './message_form';
 class MessageList extends Component {
 
   componentWillMount() {
-    fetchMessages(this.props.selectedChannel);
+    this.fetchMessages();
+  };
+
+  componentDidMount() {
+    this.refresher = setInterval(function() {
+      this.fetchMessages
+    }, 5000);
+  };
+
+  componentDidUpdate() {
+    this.list.scrollTop = this.list.scrollHeight;
+
+  };
+
+  componentWillUnmount() {
+    clearInterval(this.refresher);
+  };
+
+  fetchMessages = () => {
+    this.props.fetchMessages(this.props.selectedChannel);
   };
 
   renderList() {
@@ -23,9 +42,9 @@ class MessageList extends Component {
   render() {
     return (
       <div className="message-list">
-        <ul className="list-group messages">
-          {this.renderList()}
-        </ul>
+          <ul className="list-group messages" ref={(list) => { this.list = list; }}>
+            {this.props.messages.length > 0 ? this.renderList() : "" }
+          </ul>
         <MessageForm />
       </div>
     );
@@ -35,8 +54,14 @@ class MessageList extends Component {
 function mapStateToProps(state) {
   return {
     messages: state.messages,
-    selectedChannel: state.selectedChannel
+    selectedChannel: state.selectedChannel,
+    currentUser: state.currentUser,
+    channels: state.channels
   };
+};
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({ fetchMessages }, dispatch);
 }
 
-export default connect(mapStateToProps)(MessageList);
+export default connect(mapStateToProps, mapDispatchToProps)(MessageList);
