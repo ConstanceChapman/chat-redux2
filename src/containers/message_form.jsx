@@ -12,6 +12,10 @@ class MessageForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  componentDidMount() {
+    this.messageInput.focus();
+  };
+
   handleChange(event) {
     this.setState({ value: event.target.value });
   }
@@ -30,6 +34,7 @@ class MessageForm extends Component {
           autoComplete="off"
           value={this.state.value}
           onChange={this.handleChange}
+          ref={(messageInput) => { this.messageInput = messageInput; }}
         />
         <button type="submit">Send</button>
       </form>
